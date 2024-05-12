@@ -105,6 +105,11 @@ class ConnectFour:
                 print("I said no")
                 self.s.send(msg.encode("utf-8"))
             return
+        elif p == "QUIT":
+            msg = "QUIT"
+            self.s.send(msg.encode("utf-8"))
+            self.master.destroy()
+            self.s.close()
         elif p == "YES":
             self.reset_board()
             return
@@ -139,6 +144,10 @@ class ConnectFour:
         ### the other accepts
         return
 
+    def quit(self):
+        msg = "QUIT"
+        self.s.send(msg.encode("utf-8"))
+        return
 
 
 def main():
@@ -167,6 +176,11 @@ def main():
     reset = tk.Button(game.master, text="RESET", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
                    command=game.reset, bg="light green", relief=tk.GROOVE)
     reset.grid(row=2, column=0, padx=5)
+
+    quit = tk.Button(game.master, text="QUIT", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
+                   command=game.quit, bg="light green", relief=tk.GROOVE)
+    quit.grid(row=2, column=1, padx=5)
+
 
     root.mainloop()
 

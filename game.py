@@ -12,6 +12,8 @@ class ConnectFour:
         self.canvas.grid(row=0 ,column=0 ,columnspan=2 ,pady=10)
         self.board = [[0] * 7 for _ in range(6)]  # 6 rows, 7 columns
         self.turn = 1  # Player 1's turn: 1, Player 2's turn: 2
+        self.score1 = 0
+        self.score2 = 0
         self.start_server()
         self.draw_board()
 
@@ -104,12 +106,18 @@ class ConnectFour:
                 msg = "NO"
                 self.c.send(msg.encode("utf-8"))
             return
+        elif p == "QUIT":
+            msg = "QUIT"
+            self.c.send(msg.encode("utf-8"))
+            self.master.destroy()
+            self.c.close()
         elif p == "YES":
             self.reset_board()
             return
         elif p == "NO":
             print("told me no")
             return
+        
         p = int(p)
         self.handle_play(p)
 
@@ -137,7 +145,10 @@ class ConnectFour:
         self.c.send(msg.encode("utf-8"))
         return
         
-
+    def quit(self):
+        msg = "QUIT"
+        self.c.send(msg.encode("utf-8"))
+        return
 
         
 
@@ -163,6 +174,10 @@ def main():
     reset = tk.Button(game.master, text="RESET", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
                    command=game.reset, bg="light green", relief=tk.GROOVE)
     reset.grid(row=2, column=0, padx=5)
+
+    quit = tk.Button(game.master, text="QUIT", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
+                   command=game.quit, bg="light green", relief=tk.GROOVE)
+    quit.grid(row=2, column=1, padx=5)
 
         # buttons.append(button)
     
