@@ -9,7 +9,7 @@ class ConnectFour:
         self.master = master
         self.master.title("Connect Four")
         self.canvas = tk.Canvas(master, width=500, height=450, bg="light green", highlightthickness=0)
-        self.canvas.pack(pady=10)
+        self.canvas.grid(row=0 ,column=0 ,columnspan=2 ,pady=10)
         self.board = [[0] * 7 for _ in range(6)]  # 6 rows, 7 columns
         self.turn = 1  # Player 1's turn: 1, Player 2's turn: 2
         self.start_server()
@@ -95,6 +95,21 @@ class ConnectFour:
 
     def apply_play(self,p):
         p = p.decode("utf-8")
+        if p == "RESET":
+            if self.check() == 'yes':
+                self.reset_board()
+                msg = "YES"
+                self.c.send(msg.encode("utf-8"))
+            else:
+                msg = "NO"
+                self.c.send(msg.encode("utf-8"))
+            return
+        elif p == "YES":
+            self.reset_board()
+            return
+        elif p == "NO":
+            print("told me no")
+            return
         p = int(p)
         self.handle_play(p)
 
@@ -107,11 +122,22 @@ class ConnectFour:
         while True:
             self.p = self.c.recv(10)
             self.apply_play(self.p)
+            
     
     def send_message(self,col):
         if self.turn != 1:
             return
         self.drop_piece(col)
+
+    def check(self):
+        return messagebox.askquestion("RESET","Reset?")
+
+    def reset(self):
+        msg = "RESET"
+        self.c.send(msg.encode("utf-8"))
+        return
+        
+
 
         
 
@@ -127,23 +153,19 @@ def main():
     #     return handler
         
     buttons_frame = tk.Frame(root, bg="white")
-    buttons_frame.pack(pady=10)
+    buttons_frame.grid(row=1 ,column=0 ,columnspan=2 ,pady=10)
     # buttons = []
     for col in range(7):
         button = tk.Button(buttons_frame, text=str(col+1), font=("Helvetica", 12, "bold"), width=5, height=1,
                    command=lambda col=col: game.send_message(col), bg="sky blue", relief=tk.GROOVE)
         button.grid(row=0, column=col, padx=5)
     
-    
+    reset = tk.Button(game.master, text="RESET", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
+                   command=game.reset, bg="light green", relief=tk.GROOVE)
+    reset.grid(row=2, column=0, padx=5)
 
         # buttons.append(button)
     
-    
-
-    
-    
-        
-
     root.mainloop()
 
 
