@@ -8,12 +8,15 @@ class ConnectFour:
     def __init__(self, master):
         self.master = master
         self.master.title("Connect Four")
+        self.player1_score = tk.IntVar()
+        self.player2_score = tk.IntVar()
+        # Initial scores
+        self.player1_score.set(0)
+        self.player2_score.set(0)
         self.canvas = tk.Canvas(master, width=500, height=450, bg="light green", highlightthickness=0)
-        self.canvas.grid(row=0 ,column=0 ,columnspan=2 ,pady=10)
+        self.canvas.grid(row=1 ,column=0 ,columnspan=4 ,pady=10)
         self.board = [[0] * 7 for _ in range(6)]  # 6 rows, 7 columns
         self.turn = 1  # Player 1's turn: 1, Player 2's turn: 2
-        self.score1 = 0
-        self.score2 = 0
         self.start_server()
         self.draw_board()
 
@@ -53,6 +56,10 @@ class ConnectFour:
                     self.send_play(col)
                 if self.check_win(row, col):
                     messagebox.showinfo("Winner", f"Player {self.turn} wins!")
+                    if self.turn == 1:
+                        self.player1_score.set(self.player1_score.get() + 1)
+                    else:
+                        self.player2_score.set(self.player2_score.get() + 1)
                     self.reset_board()
                 elif all(self.board[row][col] != 0 for col in range(7) for row in range(6)):
                     messagebox.showinfo("Draw", "It's a draw!")
@@ -158,13 +165,28 @@ def main():
     root.configure(bg="white")
     game = ConnectFour(root)
     
-    # def create_drop_piece_handler(col):
-    #     print(f"?????? : {game.turn}")
-    #     def handler():
-    #     return handler
-        
+    # Labels to display scores
+    player1 = tk.Frame(root, bg="white")
+    player1.grid(row=0, column=0, padx=5)
+
+    player1_label = tk.Label(player1, text="Player 1", width=13, height=1,padx=2,pady=5, bg="light green", relief=tk.GROOVE)
+    player1_label.grid(row=0, column=0)
+
+    player1_score_label = tk.Label(player1, textvariable=game.player1_score, width=3, height=1,padx=2,pady=5, bg="light green", relief=tk.GROOVE)
+    player1_score_label.grid(row=0, column=1)
+
+    
+    player2 = tk.Frame(root, bg="white")
+    player2.grid(row=0, column=1, padx=5)
+
+    player2_label = tk.Label(player2, text="Player 2", width=13, height=1,padx=2,pady=5, bg="light green", relief=tk.GROOVE)
+    player2_label.grid(row=0, column=2)
+
+    player2_score_label = tk.Label(player2, textvariable=game.player2_score, width=3, height=1,padx=2,pady=5, bg="light green", relief=tk.GROOVE)
+    player2_score_label.grid(row=0, column=3)
+
     buttons_frame = tk.Frame(root, bg="white")
-    buttons_frame.grid(row=1 ,column=0 ,columnspan=2 ,pady=10)
+    buttons_frame.grid(row=2 ,column=0 ,columnspan=2 ,pady=10)
     # buttons = []
     for col in range(7):
         button = tk.Button(buttons_frame, text=str(col+1), font=("Helvetica", 12, "bold"), width=5, height=1,
@@ -173,11 +195,11 @@ def main():
     
     reset = tk.Button(game.master, text="RESET", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
                    command=game.reset, bg="light green", relief=tk.GROOVE)
-    reset.grid(row=2, column=0, padx=5)
+    reset.grid(row=3, column=0, padx=5)
 
     quit = tk.Button(game.master, text="QUIT", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
                    command=game.quit, bg="light green", relief=tk.GROOVE)
-    quit.grid(row=2, column=1, padx=5)
+    quit.grid(row=3, column=1, padx=5)
 
         # buttons.append(button)
     
