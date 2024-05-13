@@ -10,11 +10,14 @@ class ConnectFour:
         self.master.title("Connect Four")
         self.player1_score = tk.IntVar()
         self.player2_score = tk.IntVar()
+        self.chat_frame = tk.Frame(master, bg="light green")
+        self.input_entry = tk.Entry(self.chat_frame, width=40)
+        self.msg_text = tk.Text(self.chat_frame, height=35, width=50)
         # Initial scores
         self.player1_score.set(0)
         self.player2_score.set(0)
         self.canvas = tk.Canvas(master, width=500, height=450, bg="light green", highlightthickness=0)
-        self.canvas.grid(row=1 ,column=0 ,columnspan=4 ,pady=10)
+        self.canvas.grid(row=1 ,column=0 ,columnspan=2 ,pady=10)
         self.board = [[0] * 7 for _ in range(6)]  # 6 rows, 7 columns
         self.turn = 1  # Player 1's turn: 1, Player 2's turn: 2
         self.start_server()
@@ -122,7 +125,9 @@ class ConnectFour:
             self.reset_board()
             return
         elif p == "NO":
-            print("told me no")
+            return
+        elif p not in ['1', '2', '3', '4', '5', '6', '7']:
+            self.msg_text.insert(tk.END, p + "\n")
             return
         
         p = int(p)
@@ -135,7 +140,7 @@ class ConnectFour:
         
     def receive_message(self):
         while True:
-            self.p = self.c.recv(10)
+            self.p = self.c.recv(1024)
             self.apply_play(self.p)
             
     
@@ -157,6 +162,13 @@ class ConnectFour:
         self.c.send(msg.encode("utf-8"))
         return
 
+    def chat_send(self):
+        msg = self.input_entry.get()
+        msg = "player1 : "+msg
+        self.msg_text.insert(tk.END, msg + "\n")
+        self.c.send(msg.encode("utf-8"))
+        self.input_entry.delete(0, tk.END)
+        
         
 
 
@@ -164,7 +176,20 @@ def main():
     root = tk.Tk()
     root.configure(bg="white")
     game = ConnectFour(root)
+
+    game.chat_frame.grid(row=0, column=2,rowspan=4, padx=5)
+
+    chat_label = tk.Label(game.chat_frame, text="Chat", font=("Helvetica", 14, "bold"), bg = "light green")
+    chat_label.grid(row=0, column=2, padx=5,pady=5)
+
+    game.msg_text.grid(row=1, column=2, padx=5,pady=5)
+
     
+    game.input_entry.grid(row=2, column=2, padx=5,pady=5)
+
+    send_button = tk.Button(game.chat_frame, text="Send", command=game.chat_send)
+    send_button.grid(row=3, column=2, padx=5,pady=5)
+
     # Labels to display scores
     player1 = tk.Frame(root, bg="white")
     player1.grid(row=0, column=0, padx=5)
@@ -190,7 +215,7 @@ def main():
     # buttons = []
     for col in range(7):
         button = tk.Button(buttons_frame, text=str(col+1), font=("Helvetica", 12, "bold"), width=5, height=1,
-                   command=lambda col=col: game.send_message(col), bg="sky blue", relief=tk.GROOVE)
+                   command=lambda col=col: game.send_message(col), bg="light green", relief=tk.GROOVE)
         button.grid(row=0, column=col, padx=5)
     
     reset = tk.Button(game.master, text="RESET", font=("Helvetica", 12, "bold"), width=13, height=1,padx=5,pady=5,
