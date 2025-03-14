@@ -8,6 +8,13 @@ class ConnectFour:
     def __init__(self, master):
         self.master = master
         self.master.title("Connect Four")
+
+        self.waiting = tk.Toplevel(background="light green")
+        self.waiting.geometry("200x100")
+        self.waiting_label=tk.Label(self.waiting, text="Wait Player 2", width=13, height=1,padx=2,pady=5,font=("Helvetica", 14, "bold"), bg="light green")
+        self.waiting_label.grid(row=0,column=0)
+        self.master.withdraw()
+
         self.player1_score = tk.IntVar()
         self.player2_score = tk.IntVar()
         self.chat_frame = tk.Frame(master, bg="light green")
@@ -135,6 +142,10 @@ class ConnectFour:
 
     def handle_client(self):
             self.c,ad = self.s.accept()
+
+            self.waiting.destroy()
+            self.master.deiconify()
+            
             receive = Thread(target = self.receive_message)
             receive.start()
         
